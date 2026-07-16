@@ -114,7 +114,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         vector_service.add_documents(documents)
 
-        hybrid_service.build_bm25(documents)
+        hybrid_service.build_bm25(source=file.filename,documents=documents)
 
         return {
             "status": "success",

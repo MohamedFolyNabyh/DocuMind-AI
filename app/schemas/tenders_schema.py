@@ -10,10 +10,11 @@ class ChatRequest(BaseModel):
         min_lenght=5,
         max_lenght=500
     )
+    source:str
 
 class ChatResponse(BaseModel):
     answer:str
-    # sources:list[str]
+
     session_id:str
 
 class UploadResponse(BaseModel):

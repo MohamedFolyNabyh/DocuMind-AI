@@ -8,6 +8,7 @@ from app.core.container import memory_service, hybrid_service, llm_service
 class GraphState(TypedDict):
     session_id: str
     question: str
+    source:str
     history: list
     documents: list
     context: str
@@ -24,7 +25,7 @@ def load_memory_node(state: GraphState):
 
 def retrieve_node(state: GraphState):
     # استخدام الـ hybrid_service الجاهزة المتصلة بـ Qdrant و BM25
-    docs = hybrid_service.search(query=state["question"])
+    docs = hybrid_service.search(query=state["question"],source=state["source"])
     context = "\n\n".join(doc.page_content for doc in docs)
     
     # التعديل: نرجع القاموس المحدث فقط

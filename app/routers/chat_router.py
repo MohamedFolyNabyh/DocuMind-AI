@@ -28,6 +28,7 @@ async def chat(request: ChatRequest):
         result = graph.invoke({
 
             "session_id": request.session_id,
+            "source":request.source,
 
             "question":request.question
 

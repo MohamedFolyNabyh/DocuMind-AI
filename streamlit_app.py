@@ -68,10 +68,13 @@ with st.sidebar:
                 st.write(response.text)
 
                 if response.status_code == 200:
+                    st.session_state.source = uploaded_file.name
 
                     st.success("PDF uploaded successfully.")
 
                 else:
+                    st.write("Status:", response.status_code)
+                    st.write("Response:", response.text)
 
                     st.error(response.text)
 
@@ -124,7 +127,8 @@ if question:
                 API_URL,
                 json={
                     "session_id": st.session_state.session_id,
-                    "question": question
+                    "question": question,
+                    "source": st.session_state.source
                 }
             )
 

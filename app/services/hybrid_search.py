@@ -16,9 +16,7 @@ class HybridSearchService:
 
         self.vector_service = vector_service
 
-        self.documents: List[Document] = []
-
-        self.bm25: BM25Okapi | None = None
+        self.indices = {}
 
         self.reranker = CrossEncoder(
             "BAAI/bge-reranker-base"
@@ -30,77 +28,48 @@ class HybridSearchService:
     # Build BM25 Index
     # --------------------------------------------------------
 
-    def build_bm25(
-        self,
-        documents: List[Document]
-    ) -> None:
+    def build_bm25(self,source: str,documents: List[Document]):
+        logger.info("Building BM25 for %s", source)
 
-        logger.info("Building BM25 index...")
+        corpus =[doc.page_content.split() for doc in documents]
 
-        self.documents = documents
+        bm25 = BM25Okapi(corpus)
 
-        corpus = [
-            doc.page_content.split()
-            for doc in documents
-        ]
+        self.indices[source] = {"documents": documents, "bm25": bm25}
 
-        self.bm25 = BM25Okapi(corpus)
-
-        logger.info(
-            "BM25 index created with %d documents.",
-            len(documents)
-        )
-
+        logger.info("BM25 index created for %s.", source)
     # --------------------------------------------------------
     # Dense Search (Qdrant)
     # --------------------------------------------------------
 
-    def dense_search(
-        self,
-        query: str,
-        k: int = 10
-    ) -> List[Document]:
+    def dense_search(self,source: str,query: str,k: int = 10):
 
         logger.info("Running Dense Search...")
 
-        return self.vector_service.similarity_search(
-            query=query,
-            k=k
-        )
+        return self.vector_service.similarity_search(source=source,query=query,k=k)
 
     # --------------------------------------------------------
     # BM25 Search
     # --------------------------------------------------------
 
-    def keyword_search(
-        self,
-        query: str,
-        k: int = 10
-    ) -> List[Document]:
-
+    def keyword_search(self,source: str,query: str,k: int = 10):
         logger.info("Running BM25 Search...")
 
-        if self.bm25 is None:
+        if source not in self.indices:
 
-            logger.warning("BM25 has not been built yet.")
+            logger.warning("No BM25 index found.")
 
             return []
 
-        scores = self.bm25.get_scores(
-            query.split()
-        )
+        bm25 = self.indices[source]["bm25"]
 
-        ranked = sorted(
-            zip(scores, self.documents),
-            key=lambda x: x[0],
-            reverse=True
-        )
+        documents = self.indices[source]["documents"]
 
-        return [
-            doc
-            for _, doc in ranked[:k]
-        ]
+        scores = bm25.get_scores(query.split())
 
+        ranked = sorted(zip(scores, documents),key=lambda x: x[0],reverse=True)
+
+        return [doc for _, doc in ranked[:k]]
     # --------------------------------------------------------
     # Reciprocal Rank Fusion
     # --------------------------------------------------------
@@ -198,16 +167,16 @@ class HybridSearchService:
     # Complete Hybrid Search
     # --------------------------------------------------------
 
-    def search(self,query: str,top_k: int = 5) -> List[Document]:
+    def search(self,query: str,source: str,top_k: int = 5) -> List[Document]:
 
         logger.info("=" * 60)
         logger.info("Hybrid Search Started")
         logger.info("Query: %s", query)
 
-        dense_results = self.dense_search(query=query, k=10)
+        dense_results = self.dense_search(query=query,source=source, k=10)
 
         keyword_results = self.keyword_search(
-            query=query,
+            query=query,source=source,
             k=10
         )
 

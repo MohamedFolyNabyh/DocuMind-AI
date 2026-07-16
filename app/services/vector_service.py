@@ -180,7 +180,7 @@ class VectorService:
 
     def similarity_search(
         self,
-        query: str,
+        query: str,source,
         k: int = 5,
     ) -> List[Document]:
 
@@ -191,8 +191,18 @@ class VectorService:
         response = self.client.query_points(
             collection_name=self.COLLECTION_NAME,
             query=query_vector,
+            query_filter=Filter(
+                must=[FieldCondition(
+                        key="source",
+                        match=MatchValue(
+                            value=source
+                        ),
+                    )
+                ]
+            ),
             limit=k,
         )
+           
 
         documents = []
 
@@ -220,7 +230,7 @@ class VectorService:
 
     # ---------------------------------------------------------
 
-    def delete_collection(self) -> None:
+    def delete_collection(self,source:str) -> None:
 
         self.client.delete_collection(
             collection_name=self.COLLECTION_NAME
