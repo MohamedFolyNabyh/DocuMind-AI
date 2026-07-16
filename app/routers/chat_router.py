@@ -18,10 +18,9 @@ router = APIRouter(
     response_model=ChatResponse
 )
 async def chat(request: ChatRequest):
-
-        # """
-        # Chat with Saudi Tender Agent.
-        # """
+    """
+        Chat with indexed documents using AI.
+    """
 
     try:
 

@@ -10,7 +10,7 @@ API_URL = r"https://fictional-space-halibut-r4qpvq9gxjvcpwvp-8000.app.github.dev
 UPLOAD_URL = r"https://fictional-space-halibut-r4qpvq9gxjvcpwvp-8000.app.github.dev/upload/"
 
 st.set_page_config(
-    page_title="Saudi Tender Agent",
+    page_title="DocuMind AI",
     page_icon="📄",
     layout="wide"
 )
@@ -90,9 +90,9 @@ with st.sidebar:
 # Main Page
 # ==========================
 
-st.title("📄 Saudi Tender AI Agent")
+st.title("📄 DocuMind AI")
 
-st.caption("Ask questions about uploaded Saudi Tender documents.")
+st.caption("Upload PDF documents and chat with them using AI")
 
 # Display previous messages
 

@@ -5,14 +5,13 @@ from app.routers.chat_router import router as chat_router
 
 
 app = FastAPI(
-    title="Saudi Tender Agent",
-    description="AI Agent for Saudi Government Tenders",
+    title="DocuMind AI",
+    description="Enterprise RAG Assistant for Intelligent Document Question Answering",
     version="1.0.0"
 )
 
 
 app.include_router(upload_router)
-
 app.include_router(chat_router)
 
 
@@ -20,5 +19,7 @@ app.include_router(chat_router)
 async def root():
 
     return {
-        "message": "Saudi Tender Agent API"
+        "message": "Welcome to DocuMind AI API",
+        "version": "1.0.0",
+        "status": "running"
     }
